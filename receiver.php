@@ -38,15 +38,13 @@ if (MODE === "GET") {
     $datas = $receivedData["datas"];
     $unstackedData = [];
     foreach ($datas as $data => $content) { // Iterate on each evenement
-		$timestamp = $content["timestamp"];  // Get timestamp of event
-	    file_put_contents(FILENAME, "$timestamp\n", FILE_APPEND | LOCK_EX);		
-		$values = $content["values"];
-		foreach ($values as $key => $value)
-			file_put_contents(FILENAME, "$key:$value\n", FILE_APPEND | LOCK_EX);
-
-	
-		array_push($unstackedData, [$timestamp, $values]);
+	$timestamp = $content["timestamp"];  // Get timestamp of event
+	file_put_contents(FILENAME, "$timestamp\n", FILE_APPEND | LOCK_EX);		
+	$values = $content["values"];
+	array_push($unstackedData, [$timestamp, $values]);
+	foreach ($values as $key => $value)
+		file_put_contents(FILENAME, "$key:$value\n", FILE_APPEND | LOCK_EX);
     }
-	file_put_contents(FILENAME, ">>FROM:$node_ref LinkQuality:$link_quality Rssi:$rssi lat=$lat lng=$lng\n", FILE_APPEND | LOCK_EX);
+    file_put_contents(FILENAME, ">>FROM:$node_ref LinkQuality:$link_quality Rssi:$rssi lat=$lat lng=$lng\n", FILE_APPEND | LOCK_EX);
 }
     
