@@ -2,7 +2,7 @@
 /* *** receive data from telemesure.net service
 */
 define("MODE", "DECODED"); //use GET, POST or EXTENDED
-define("FILENAME", "/log/receive_log.txt"); //name of the file
+define("FILENAME", "received_log.txt"); //name of the file
 if (MODE === "GET") {
 	$id = $_GET["id"];  // transmitter ID
     $data = $_GET["data"]; // payload
@@ -33,18 +33,20 @@ if (MODE === "GET") {
     $rssi = $receivedData["rssi"];     // intensity of signal
     $lat = $receivedData["lat"];     // geo latitude
     $lng = $receivedData["lng"];     // geo longitude
-    
+
 	//Unstack received data to exploit it
     $datas = $receivedData["datas"];
     $unstackedData = [];
     foreach ($datas as $data => $content) { // Iterate on each evenement
-    $timestamp = $content["timestamp"];  // Get timestamp of event 
-    $values = $content["values"];
-	$eventData = $values["messageBrutAnalyse"]; //Get data from event
+		$timestamp = $content["timestamp"];  // Get timestamp of event
+	    file_put_contents(FILENAME, "$timestamp\n", FILE_APPEND | LOCK_EX);		
+		$values = $content["values"];
+		foreach ($values as $key => $value)
+			file_put_contents(FILENAME, "$key:$value\n", FILE_APPEND | LOCK_EX);
+
 	
-	array_push($unstackedData, [$timestamp, $values]);
+		array_push($unstackedData, [$timestamp, $values]);
     }
-	file_put_contents(FILENAME, "$id,$$unstackedData\n", FILE_APPEND | LOCK_EX);
 	file_put_contents(FILENAME, ">>FROM:$node_ref LinkQuality:$link_quality Rssi:$rssi lat=$lat lng=$lng\n", FILE_APPEND | LOCK_EX);
 }
     
